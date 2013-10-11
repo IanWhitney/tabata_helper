@@ -1,6 +1,8 @@
-TabataSet = Struct.new(:count) do
+TabataInterval = Struct.new(:full_effort, :light_effort)
+
+TabataSet = Struct.new(:count, :interval) do
   def duration
-    count * 30
+    count * (interval.full_effort + interval.light_effort)
   end
 end
 
@@ -28,11 +30,15 @@ class Workout
     puts "Start at #{stopwatch.to_minutes}"
 
     sets.each do |set|
-      puts "Do #{set.count} sets until #{stopwatch.advance(set.duration).to_minutes}"
+      set.count.times do |s|
+        puts "Full to #{stopwatch.advance(set.interval.full_effort).to_minutes}"
+        puts "Light to #{stopwatch.advance(set.interval.light_effort).to_minutes}"
+      end
       puts "Rest for #{rest_period} until #{stopwatch.advance(rest_period).to_minutes}"
     end
   end
 end
 
-tabata_sets = [3,2,3].map {|c| TabataSet.new(c)}
+interval = TabataInterval.new(20,10)
+tabata_sets = [3,2,3].map {|c| TabataSet.new(c, interval)}
 Workout.new(tabata_sets, 60, 45, Stopwatch.new)
